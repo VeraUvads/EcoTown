@@ -1,4 +1,4 @@
-package com.example.android.ecotown.Activities
+package com.example.android.ecotown.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

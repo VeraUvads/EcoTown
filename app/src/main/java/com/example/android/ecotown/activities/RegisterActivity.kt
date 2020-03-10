@@ -1,4 +1,4 @@
-package com.example.android.ecotown.Activities
+package com.example.android.ecotown.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -39,9 +39,7 @@ class RegisterActivity : AppCompatActivity() {
                 binding.regButton.visibility = View.VISIBLE
                 makeText("Все поля должны быть заполнены")
             } else {
-
                 createUserAccount(email, name, password)
-
             }
 
 
