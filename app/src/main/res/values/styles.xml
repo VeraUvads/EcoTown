@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="textRegister">
+        <item name="android:textColor">@color/colorText</item>
+    </style>
+
 </resources>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "220042502221",
+    "firebase_url": "https://ecotown-4043b.firebaseio.com",
+    "project_id": "ecotown-4043b",
+    "storage_bucket": "ecotown-4043b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220042502221:android:ed034bd5028b3aefdefc04",
+        "android_client_info": {
+          "package_name": "com.example.android.ecotown"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "220042502221-3toivv1ptptruf6r2qqqpnhb7csbqvuj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.ecotown",
+            "certificate_hash": "5c929cf494ef0256e143eaeff11e1707d586f908"
+          }
+        },
+        {
+          "client_id": "220042502221-q0e9d9at43piipv7qv9u8r6nioaitmrv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_ZMUScmbKozsnu-Xm714iqXwIJiTNqEM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "220042502221-q0e9d9at43piipv7qv9u8r6nioaitmrv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
