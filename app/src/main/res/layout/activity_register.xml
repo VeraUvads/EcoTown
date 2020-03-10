@@ -11,59 +11,69 @@
         android:id="@+id/imageTree"
         android:layout_width="113dp"
         android:layout_height="215dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="35dp"
         android:src="@drawable/tree_photo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+    <EditText
+        android:id="@+id/regName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/reg_edittext_style"
+        android:ems="12"
+        android:hint="Name"
+        android:inputType="textPersonName"
+        android:textColor="@color/colorText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_percent="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageTree" />
 
     <EditText
         android:id="@+id/regEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="10dp"
+        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/reg_edittext_style"
         android:ems="12"
         android:hint="E-mail"
         android:inputType="textPersonName"
         android:textColor="@color/colorText"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageTree" />
+        app:layout_constraintTop_toBottomOf="@+id/regName" />
 
     <EditText
         android:id="@+id/regPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_margin="15dp"
         android:background="@drawable/reg_edittext_style"
         android:ems="12"
         android:hint="Password"
         android:inputType="textPassword"
+        android:textColor="@color/colorText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
+        app:layout_constraintTop_toBottomOf="@+id/regEmail" />
 
     <EditText
         android:id="@+id/regConfirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:layout_marginTop="5dp"
         android:background="@drawable/reg_edittext_style"
         android:ems="12"
         android:hint="Confirm password"
         android:inputType="textPassword"
+        android:textColor="@color/colorText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/regPassword" />
