@@ -8,6 +8,7 @@ apply plugin: 'com.google.gms.google-services'
 
 
 android {
+    viewBinding.enabled = true
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
@@ -24,7 +25,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    viewBinding.enabled = true
+
 }
 
 dependencies {
