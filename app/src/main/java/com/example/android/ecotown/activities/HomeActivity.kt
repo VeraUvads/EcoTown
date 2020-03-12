@@ -39,7 +39,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(bindingHome.root)
 
         mAuth = FirebaseAuth.getInstance()
-        val currentUser = mAuth?.currentUser
+        val currentUser = mAuth.currentUser
         navHeader(currentUser)
 
         var toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -73,6 +73,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         supportActionBar?.title = item.title
+
         when (item.itemId) {
             R.id.nav_home -> {
                 supportFragmentManager.beginTransaction()
