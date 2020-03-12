@@ -16,31 +16,18 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/yellow"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Navigation Drawer"
-                    android:textColor="#FFFFFF"
-                    style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"/>
-            </LinearLayout>
+
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
 
     <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="This is my content area."/>
+
     </LinearLayout>
 
 </LinearLayout>
