@@ -1,4 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
 
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_profile"
+            android:title="Профиль" />
+        <item
+            android:id="@+id/nav_track"
+            android:icon="@drawable/ic_track"
+            android:title="Мой след" />
+
+
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_location"
+            android:title="На карте" />
+
+        <item android:title="Аккаунт">
+            <menu>
+                <item
+                    android:id="@+id/nav_settings"
+                    android:icon="@drawable/ic_settings"
+                    android:title="Настройки" />
+                <item
+                    android:id="@+id/nav_logout"
+                    android:icon="@drawable/ic_send"
+                    android:title="Log out" />
+            </menu>
+        </item>
+
+    </group>
 </menu>

@@ -24,7 +24,7 @@
         android:id="@+id/nav_user_mail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/nav_header_subtitle"
+        android:text="yourMail@gmail.com"
         android:textColor="@color/colorText"
         android:textSize="14sp" />
 
