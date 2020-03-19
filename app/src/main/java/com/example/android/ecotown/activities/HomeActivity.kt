@@ -28,6 +28,8 @@ import com.example.android.ecotown.fragment.TrackFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.nav_header.view.*
@@ -62,6 +64,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         bindingHome = ActivityHomeBinding.inflate(layoutInflater)
         bindingContent = ContentMainBinding.inflate(layoutInflater)
         bindingHomeFragment = FragmentHomeBinding.inflate(layoutInflater)
+        bindingPopUp = PopupBinding.inflate(layoutInflater)
 
         setContentView(bindingHome.root)
 
@@ -85,7 +88,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navView.setNavigationItemSelectedListener(this)
 
-
+        bar = bindingPopUp.progressBarAdd
     }
 
     private fun navHeader(currentUser: FirebaseUser?) {
@@ -128,13 +131,13 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     fun iniPop(view: View) {
         popUp = Dialog(this)
-        bindingPopUp = PopupBinding.inflate(layoutInflater)
+     //   bindingPopUp = PopupBinding.inflate(layoutInflater)
         popUp.setContentView(bindingPopUp.root)
         popUp.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         popUp.window
             ?.setLayout(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
         popUp.window?.attributes?.gravity = Gravity.TOP
-        bar = bindingPopUp.progressBarAdd
+
         popUp.show()
 
 
@@ -166,8 +169,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun openGallery() {
-        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.type = "image/*";
+        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT)
+        galleryIntent.type = "image/*"
         startActivityForResult(galleryIntent, requestCode)
     }
 
@@ -188,12 +191,12 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         view.visibility = View.INVISIBLE
         bar.visibility = View.VISIBLE
 
-        if (bindingPopUp.description.text.toString().isEmpty() && bindingPopUp.title.text.toString().isEmpty()) {
+        if (bindingPopUp.description.text.toString().isEmpty() && bindingPopUp.title.text.toString().isEmpty() && pickedImgUri.toString().isEmpty()) {
             Toast.makeText(this, "Пожалуйста заполните поля", Toast.LENGTH_SHORT).show()
             view.visibility = View.VISIBLE
             bar.visibility = View.INVISIBLE
         } else {
-            val storageReference = FirebaseStorage.getInstance().reference.child("user_images")
+          /*  val storageReference = FirebaseStorage.getInstance().reference.child("user_images")
             val imagePathFile: StorageReference =
                 storageReference.child(pickedImgUri.lastPathSegment.toString())
 
@@ -206,7 +209,11 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     addPost(post)
                 }
-            }
+            }.addOnFailureListener {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                view.visibility = View.VISIBLE
+                bar.visibility = View.INVISIBLE
+            }*/
 
 
 
@@ -216,6 +223,17 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun addPost(post: Post) {
+        val database : FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef : DatabaseReference = database.getReference("Posts").push()
+        val key = myRef.key.toString()
+        post.postKey = key
+
+        myRef. setValue(post).addOnSuccessListener {
+            Toast.makeText(this, "Пост добавлен", Toast.LENGTH_SHORT).show()
+            bindingPopUp.popupAddButton.visibility = View.VISIBLE
+            bar.visibility = View.INVISIBLE
+            popUp.dismiss()
+        }
 
     }
 

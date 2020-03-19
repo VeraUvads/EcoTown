@@ -8,6 +8,7 @@ class Post constructor( var title: String,
     var userPhoto: String
 ) {
 
-    var timeStamp: Any = ServerValue.TIMESTAMP
+    val timeStamp: Any = ServerValue.TIMESTAMP
+    lateinit var postKey : String
 
 }
