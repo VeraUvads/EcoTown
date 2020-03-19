@@ -28,6 +28,8 @@ import com.example.android.ecotown.fragment.TrackFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.nav_header.view.*
@@ -40,7 +42,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var bindingPopUp: PopupBinding
     private lateinit var bindingHomeFragment: FragmentHomeBinding
 
-    lateinit var mAuth: FirebaseAuth
+    private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUser: FirebaseUser
 
     private lateinit var drawerLayout: DrawerLayout
@@ -50,10 +52,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var bar: ProgressBar
 
-    private val pReqCode = 2;
+    private val pReqCode = 2
     private val requestCode = 2
 
-    private lateinit var pickedImgUri: Uri
+    private var pickedImgUri: Uri = Uri.EMPTY
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,11 +138,18 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         popUp.window?.attributes?.gravity = Gravity.TOP
         bar = bindingPopUp.progressBarAdd
         popUp.show()
+        bindingPopUp.addPicture.setOnClickListener {
+            checkAndRequestForPermission(it)
+        }
+
+        bindingPopUp.popupAddButton.setOnClickListener {
+            addingButton(it)
+        }
 
 
     }
 
-    fun checkAndRequestForPermission(view: View) {
+    private fun checkAndRequestForPermission(view: View) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -166,8 +175,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun openGallery() {
-        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.type = "image/*";
+        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT)
+        galleryIntent.type = "image/*"
         startActivityForResult(galleryIntent, requestCode)
     }
 
@@ -177,18 +186,23 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (resultCode == RESULT_OK && requestCode == this.requestCode && data != null) {
 
             pickedImgUri = data.data!!
-            bindingPopUp.addPicture.setImageURI(pickedImgUri);
+            bindingPopUp.addPicture.setImageURI(pickedImgUri)
+
 
         }
     }
 
 
-    fun addingButton(view: View) {
+    private fun addingButton(view: View) {
 
         view.visibility = View.INVISIBLE
         bar.visibility = View.VISIBLE
 
-        if (bindingPopUp.description.text.toString().isEmpty() && bindingPopUp.title.text.toString().isEmpty()) {
+        val isEmptyDescription = bindingPopUp.description.text.toString().isEmpty()
+        val isEmptyTitel = bindingPopUp.title.text.toString().isEmpty()
+        val isEmptyUri = Uri.EMPTY == pickedImgUri
+
+        if (isEmptyDescription || isEmptyTitel || isEmptyUri) {
             Toast.makeText(this, "Пожалуйста заполните поля", Toast.LENGTH_SHORT).show()
             view.visibility = View.VISIBLE
             bar.visibility = View.INVISIBLE
@@ -196,18 +210,24 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val storageReference = FirebaseStorage.getInstance().reference.child("user_images")
             val imagePathFile: StorageReference =
                 storageReference.child(pickedImgUri.lastPathSegment.toString())
-
             imagePathFile.putFile(pickedImgUri).addOnSuccessListener {
-                imagePathFile.downloadUrl.addOnSuccessListener{
-                    val imageDownloadLink : String = it.toString()
-                    val post = Post(bindingPopUp.title.text.toString(), bindingPopUp.title.description.toString(),  imageDownloadLink,
+                imagePathFile.downloadUrl.addOnSuccessListener {
+                    val imageDownloadLink: String = it.toString()
+                    val post = Post(
+                        bindingPopUp.title.text.toString(),
+                        bindingPopUp.title.text.toString(),
+                        imageDownloadLink,
                         currentUser.uid,
-                        currentUser.photoUrl.toString())
+                        currentUser.photoUrl.toString()
+                    )
 
                     addPost(post)
                 }
+            }.addOnFailureListener {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                view.visibility = View.VISIBLE
+                bar.visibility = View.INVISIBLE
             }
-
 
 
         }
@@ -216,9 +236,16 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun addPost(post: Post) {
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: DatabaseReference = database.getReference("Posts").push()
+        val key = myRef.key.toString()
+        post.postKey = key
 
+        myRef.setValue(post).addOnSuccessListener {
+            Toast.makeText(this, "Пост добавлен", Toast.LENGTH_SHORT).show()
+            bindingPopUp.popupAddButton.visibility = View.VISIBLE
+            bar.visibility = View.INVISIBLE
+            popUp.dismiss()
+        }
     }
-
-
-
 }
