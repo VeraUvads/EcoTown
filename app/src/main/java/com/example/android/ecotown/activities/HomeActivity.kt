@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.example.android.ecotown.Models.Post
 import com.example.android.ecotown.R
 import com.example.android.ecotown.databinding.*
 import com.example.android.ecotown.fragment.HomeFragment
@@ -27,7 +28,10 @@ import com.example.android.ecotown.fragment.TrackFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.nav_header.view.*
+import kotlinx.android.synthetic.main.popup.view.*
 
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -37,6 +41,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var bindingHomeFragment: FragmentHomeBinding
 
     lateinit var mAuth: FirebaseAuth
+    private lateinit var currentUser: FirebaseUser
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
@@ -46,7 +51,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var bar: ProgressBar
 
     private val pReqCode = 2;
-    private val requesCode = 2
+    private val requestCode = 2
 
     private lateinit var pickedImgUri: Uri
 
@@ -61,10 +66,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(bindingHome.root)
 
         mAuth = FirebaseAuth.getInstance()
-        val currentUser = mAuth.currentUser
+        currentUser = mAuth.currentUser!!
         navHeader(currentUser)
 
-        var toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         supportFragmentManager.beginTransaction()
@@ -133,45 +138,6 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         popUp.show()
 
 
-
-    }
-
-
-    private fun openGallery() {
-        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.type = "image/*";
-        startActivityForResult(galleryIntent, requesCode)
-
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == requesCode && data != null) {
-
-            // the user has successfully picked an image
-            // we need to save its reference to a Uri variable
-            pickedImgUri = data.data!!
-            bindingPopUp.addPicture.setImageURI(pickedImgUri);
-
-        }
-    }
-
-    fun addingButton(view: View) {
-
-        view.visibility = View.INVISIBLE
-        bar.visibility = View.VISIBLE
-
-
-        if (bindingPopUp.description.text.toString().isNotEmpty() && bindingPopUp.title.text.toString().isNotEmpty()) {
-            popUp.dismiss()
-        } else {
-            Toast.makeText(this, "Пожалуйста заполните поля", Toast.LENGTH_SHORT).show()
-            view.visibility = View.VISIBLE
-            bar.visibility = View.INVISIBLE
-        }
-
-
     }
 
     fun checkAndRequestForPermission(view: View) {
@@ -198,6 +164,61 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else
             openGallery()
     }
+
+    private fun openGallery() {
+        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.type = "image/*";
+        startActivityForResult(galleryIntent, requestCode)
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == this.requestCode && data != null) {
+
+            pickedImgUri = data.data!!
+            bindingPopUp.addPicture.setImageURI(pickedImgUri);
+
+        }
+    }
+
+
+    fun addingButton(view: View) {
+
+        view.visibility = View.INVISIBLE
+        bar.visibility = View.VISIBLE
+
+        if (bindingPopUp.description.text.toString().isEmpty() && bindingPopUp.title.text.toString().isEmpty()) {
+            Toast.makeText(this, "Пожалуйста заполните поля", Toast.LENGTH_SHORT).show()
+            view.visibility = View.VISIBLE
+            bar.visibility = View.INVISIBLE
+        } else {
+            val storageReference = FirebaseStorage.getInstance().reference.child("user_images")
+            val imagePathFile: StorageReference =
+                storageReference.child(pickedImgUri.lastPathSegment.toString())
+
+            imagePathFile.putFile(pickedImgUri).addOnSuccessListener {
+                imagePathFile.downloadUrl.addOnSuccessListener{
+                    val imageDownloadLink : String = it.toString()
+                    val post = Post(bindingPopUp.title.text.toString(), bindingPopUp.title.description.toString(),  imageDownloadLink,
+                        currentUser.uid,
+                        currentUser.photoUrl.toString())
+
+                    addPost(post)
+                }
+            }
+
+
+
+        }
+
+
+    }
+
+    private fun addPost(post: Post) {
+
+    }
+
 
 
 }
