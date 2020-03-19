@@ -13,9 +13,13 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
+
+    lateinit var mAuth: FirebaseAuth
 
     lateinit var binding: FragmentHomeBinding
     override fun onCreateView(
@@ -28,11 +32,17 @@ class HomeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onStart() {
+
+        mAuth = FirebaseAuth.getInstance()
+        val currentUser = mAuth.currentUser
+        binding.textView.text = currentUser?.displayName
         createPieChart()
+
         super.onStart()
     }
 
@@ -40,7 +50,7 @@ class HomeFragment : Fragment() {
         val pieChart: PieChart = this.pieChart
         pieChart.description.isEnabled = false
 
-        pieChart.dragDecelerationFrictionCoef = 0.99f
+        pieChart.dragDecelerationFrictionCoef = 0.8f
 
         pieChart.isDrawHoleEnabled = true
         pieChart.setHoleColor(Color.WHITE)
@@ -51,8 +61,8 @@ class HomeFragment : Fragment() {
 
 
         val pieData = mutableListOf<PieEntry>()
-        pieData.add(PieEntry(25f ))
-        pieData.add(PieEntry(75f ))
+        pieData.add(PieEntry(25f))
+        pieData.add(PieEntry(75f))
 
 
         val dataSet = PieDataSet(pieData, "Hello")   //ДАННЫЕ ДЛЯ РАСПРЕДЕЛЕНИЯ
@@ -67,5 +77,6 @@ class HomeFragment : Fragment() {
 
 
 
-        pieChart.animateXY(2000,2000)}
+        pieChart.animateXY(2000, 2000)
     }
+}
