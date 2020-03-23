@@ -215,7 +215,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val imageDownloadLink: String = it.toString()
                     val post = Post(
                         bindingPopUp.title.text.toString(),
-                        bindingPopUp.title.text.toString(),
+                        bindingPopUp.description.text.toString(),
                         imageDownloadLink,
                         currentUser.uid,
                         currentUser.photoUrl.toString()

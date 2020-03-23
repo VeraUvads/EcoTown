@@ -8,7 +8,7 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_profile"
-            android:title="Профиль" />
+            android:title="Заметки" />
         <item
             android:id="@+id/nav_track"
             android:icon="@drawable/ic_track"
