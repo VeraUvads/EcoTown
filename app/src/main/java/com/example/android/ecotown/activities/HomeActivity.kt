@@ -218,7 +218,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         bindingPopUp.description.text.toString(),
                         imageDownloadLink,
                         currentUser.uid,
-                        currentUser.photoUrl.toString()
+                        currentUser.photoUrl.toString(), currentUser.displayName.toString()
                     )
 
                     addPost(post)

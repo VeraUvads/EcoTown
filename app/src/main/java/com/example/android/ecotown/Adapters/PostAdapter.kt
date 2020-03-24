@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 class PostAdapter(private var mData: MutableList<Post>) :
     RecyclerView.Adapter<PostAdapter.MyViewHolder>() {
-    lateinit var bindingCard: PostItemBinding
     private val user = FirebaseAuth.getInstance().currentUser
     lateinit var context: Context
 
@@ -34,10 +33,8 @@ class PostAdapter(private var mData: MutableList<Post>) :
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.title.text = mData[position].title
         holder.description.text = mData[position].description
-        holder.userName.text = user?.displayName
+        holder.userName.text = mData[position].userName
         Glide.with(context).load(mData[position].picture).into(holder.image)
-
-
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
