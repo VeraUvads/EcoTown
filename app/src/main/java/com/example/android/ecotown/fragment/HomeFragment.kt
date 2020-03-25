@@ -54,7 +54,6 @@ class HomeFragment : Fragment() {
     override fun onStart() {
 
         mAuth = FirebaseAuth.getInstance()
-        val currentUser = mAuth.currentUser
 
 
 
