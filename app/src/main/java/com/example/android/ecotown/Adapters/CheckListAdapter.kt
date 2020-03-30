@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.CheckBox
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.ecotown.Models.Check
 import com.example.android.ecotown.R
@@ -15,6 +17,15 @@ class CheckListAdapter(private var checkList: MutableList<Check>) :
     RecyclerView.Adapter<CheckListAdapter.MyHolderView>() {
 
     lateinit var context: Context
+    lateinit var changeList: MutableList<Check>
+
+    private val _ischecked = MutableLiveData<Boolean>()
+    val ischecked: LiveData<Boolean>
+        get() = _ischecked
+
+    var pos = 0   //ПОЧЕМУ НЕ ПЕРЕЗАПИСЫВАЕТСЯ, ОБРАЩЕНИЕ ИДЕТ В ПЕРВЫЙ РАЗ К 0 ЭЛЕМЕНТУ
+    var text = ""
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolderView {
         val row: View =
@@ -34,6 +45,12 @@ class CheckListAdapter(private var checkList: MutableList<Check>) :
         holder.card.animation = AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation)
         holder.checkBox.animation =
             AnimationUtils.loadAnimation(context, R.anim.fade_transition_animation)
+
+        holder.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->   //ПОЧЧЕМУ РЕАГИРУЕТ ТОЛЬКО НА ВТОРОЕ НАЖАТИЕ
+            _ischecked.value = isChecked
+            pos = position
+            text = checkList[position].item
+        }
 
     }
 
