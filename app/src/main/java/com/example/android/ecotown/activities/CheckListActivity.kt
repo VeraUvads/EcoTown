@@ -12,10 +12,13 @@ import com.google.firebase.database.*
 class CheckListActivity : AppCompatActivity() {
     private lateinit var bindingCheckList: ActivityCheckListBinding
 
-    private val checkList = mutableListOf<Check>()
+    private var checkList = mutableListOf<Check>()
 
     lateinit var database: FirebaseDatabase
     lateinit var databaseReference: DatabaseReference
+
+    val firstKey: String = "1HWplH_zdri52-grE2_Jy7LtXi5uHAvqJHm12Z8Tu6OM"
+    val secondKey: String = "Лист1"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,11 +29,11 @@ class CheckListActivity : AppCompatActivity() {
 
 
         database = FirebaseDatabase.getInstance()
-        databaseReference = database.getReference("Check")
+        databaseReference = database.getReference(firstKey).child(secondKey)
 
 
-         val layoutManager = LinearLayoutManager(applicationContext)
-         bindingCheckList.recycler.layoutManager = layoutManager
+        val layoutManager = LinearLayoutManager(applicationContext)
+        bindingCheckList.recycler.layoutManager = layoutManager
 
 
         val checkListener = object : ValueEventListener {
@@ -39,16 +42,22 @@ class CheckListActivity : AppCompatActivity() {
             }
 
             override fun onDataChange(p0: DataSnapshot) {
+                checkList = mutableListOf()
                 for (postSnap: DataSnapshot in p0.children) {
-                    val check = postSnap.getValue(Check::class.java)
-                    checkList.add(check!!)
+                    val idString= postSnap.child("id").value.toString()
+                    val id = idString.toIntOrNull()
+                    val item = postSnap.child("item").value.toString()
+                    val statePost = postSnap.child("state").value.toString()
+                    val state = statePost.toBoolean()
+
+                    val check = Check(id!!, item, state)
+                    checkList.add(check)
                 }
                 val checkAdapter = CheckListAdapter(checkList)
                 bindingCheckList.recycler.adapter = checkAdapter
             }
 
         }
-
         databaseReference.addValueEventListener(checkListener)
     }
 }
