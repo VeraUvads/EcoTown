@@ -43,23 +43,23 @@ class IntroActivity : AppCompatActivity() {
         val listScreens = mutableListOf<ScreenItem>()
         listScreens.add(
             ScreenItem(
-                "ghjfdghdgfd",
-                "jhkdhjkhdfjkhdfjkdfh ghdgfj dgfhdghfg dhgfhjdgh",
+                "Чек-лист эко-привычек",
+                "Экологичный образ жизни помогает не только беречь окружающую среду, но и экономить",
                 R.drawable.tree
             )
         )
         listScreens.add(
             ScreenItem(
-                "ghjfdghdgfd",
-                "jhkdhjkhdfjkhdfjkdfh ghdgfj dgfhdghfg dhgfhjdgh",
-                R.drawable.trash
+                "Делись с друзьями",
+                "Находи полезные лайф-хаки и обсуждай их со своими единомышленниками",
+                R.drawable.lung
             )
         )
         listScreens.add(
             ScreenItem(
-                "ghjfdghdgfd",
-                "jhkdhjkhdfjkhdfjkdfh ghdgfj dgfhdghfg dhgfhjdgh",
-                R.drawable.lung
+                "Карта",
+                "Ищи ближайшие пункты сортировки отходов, эко-магазины и много другое",
+                R.drawable.trash
             )
         )
 
@@ -87,7 +87,7 @@ class IntroActivity : AppCompatActivity() {
             applicationContext.getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = pref.edit()
         editor.putBoolean("isIntroOpened", true)
-        editor.commit()
+        editor.apply()
 
     }
 }
