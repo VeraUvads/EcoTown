@@ -74,23 +74,6 @@ class CheckListActivity : AppCompatActivity() {
 
             }
 
-//                    val idChanged = postSnap.child("habitId").value.toString()
-//                    val stateChanged  = postSnap.child("state").value.toString().toBoolean()
-
-//                    val changedData = ChangedData(idChanged, stateChanged)
-//                    changedDataList.add(changedData)
-
-//
-//                }if (changedDataList.isNotEmpty()){
-////                for (i in changedDataList){
-////                    for (n in checkList){
-////                    if(n.id.equals(i.habitId)){
-////                        n.state = i.state
-////                    }
-////                    }
-////                }
-
-
         }
         val changeListener = object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -119,10 +102,8 @@ class CheckListActivity : AppCompatActivity() {
 
     }
 
-    private fun listCompare() { //TODO переписать
-
+    private fun listCompare() {
         if (changedDataList.isNotEmpty()) {
-
             for (i in changedDataList) {
                 for (n in checkList) {
                     if (n.id.toString() == i.habitId) {

@@ -28,7 +28,6 @@ class CheckListAdapter(private var checkList: MutableList<Check>) :
     lateinit var referenceChangedData: DatabaseReference
 
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolderView {
         val row: View =
             LayoutInflater.from(parent.context)
@@ -44,12 +43,9 @@ class CheckListAdapter(private var checkList: MutableList<Check>) :
     override fun onBindViewHolder(holder: MyHolderView, position: Int) {
         holder.checkBox.isChecked = checkList[position].state
         holder.checkBox.text = checkList[position].item
-        holder.card.animation = AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation)
-        holder.checkBox.animation =
-            AnimationUtils.loadAnimation(context, R.anim.fade_transition_animation)
-        holder.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-            addChangedData(checkList[position].id, isChecked)
-//            listChanged.add(ChangedData(currentUserId, checkList[position].id.toString(), isChecked))
+        holder.checkBox.setOnClickListener {
+
+                    addChangedData(checkList[position].id, holder.checkBox.isChecked)
 
 
         }
@@ -58,19 +54,18 @@ class CheckListAdapter(private var checkList: MutableList<Check>) :
 
     private fun addChangedData(id: Int, checked: Boolean) {
         database = FirebaseDatabase.getInstance()
-        referenceChangedData = database.getReference(currentUserId+"Habit").push()
-        referenceChangedData.setValue(ChangedData(id.toString(), checked)).addOnSuccessListener {
-        }.addOnFailureListener{
-            Toast.makeText(this.context, "Произошла ошибка", Toast.LENGTH_SHORT).show()
-        }
-
-
+        referenceChangedData = database.getReference(currentUserId + "Habit").push()
+        referenceChangedData.setValue(ChangedData(id.toString(), checked))
+            .addOnSuccessListener {
+            }.addOnFailureListener {
+                Toast.makeText(this.context, "Произошла ошибка", Toast.LENGTH_SHORT).show()
+            }
     }
 
 
     class MyHolderView(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBoxList)
-        val card = itemView.checkBoxCard
+
     }
 
 }
