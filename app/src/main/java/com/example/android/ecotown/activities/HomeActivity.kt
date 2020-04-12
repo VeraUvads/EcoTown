@@ -24,6 +24,7 @@ import com.example.android.ecotown.Models.Post
 import com.example.android.ecotown.R
 import com.example.android.ecotown.databinding.*
 import com.example.android.ecotown.fragment.HomeFragment
+import com.example.android.ecotown.fragment.MapFragment
 import com.example.android.ecotown.fragment.TrackFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -116,6 +117,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .replace(R.id.container, TrackFragment()).commit()
             }
             R.id.nav_map -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, MapFragment()).commit()
             }
             R.id.nav_settings -> {
             }
