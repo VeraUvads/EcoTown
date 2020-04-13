@@ -3,12 +3,17 @@ package com.example.android.ecotown.fragment
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.provider.Telephony
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 
@@ -23,10 +28,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
+import java.io.IOException
+import java.lang.Exception
 
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
+    //    lateinit var adressList: MutableList<Address>
     lateinit var binding: FragmentMapBinding
     private lateinit var mMap: GoogleMap
 
@@ -59,11 +67,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
 
+        binding.svLocation.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                val location: String = binding.svLocation.query.toString()
+                var addressList = mutableListOf<Address>()
+                if (location.isNotEmpty()) {
+                    var geocoder   = Geocoder(contextMap)
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1)
 
+                    } catch (e: IOException) {
+                    }
+                    var address: Address = addressList[0]
+                    val newLocation = LatLng(address.latitude, address.longitude)
+                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
+                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
+                }
+                return false
+            }
 
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+        })
+        
         mapFragment?.getMapAsync(this)
         return binding.root
-
     }
 
     private fun fetchLastLocation() {
@@ -88,7 +119,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val marker: MarkerOptions = MarkerOptions().position(current).title("I am Here")
                 mMap.addMarker(marker)
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15f))
-                Toast.makeText(contextMap, "${currentLocation.latitude}  ${currentLocation.longitude}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    contextMap,
+                    "${currentLocation.latitude}  ${currentLocation.longitude}",
+                    Toast.LENGTH_SHORT
+                ).show()
 
             }
         }

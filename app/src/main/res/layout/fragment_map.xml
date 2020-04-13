@@ -10,4 +10,13 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sv_location"
+        android:queryHint="Search..."
+        android:background="@drawable/search_view_bg"
+        android:elevation="10dp"
+        android:iconifiedByDefault="false"
+        android:layout_margin="15dp"/>
 </FrameLayout>
