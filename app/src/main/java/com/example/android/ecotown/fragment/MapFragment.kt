@@ -1,21 +1,24 @@
 package com.example.android.ecotown.fragment
 
 import android.Manifest
+import android.app.ActionBar
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.provider.Telephony
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
+import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
 
 import com.example.android.ecotown.R
 import com.example.android.ecotown.databinding.FragmentMapBinding
@@ -44,6 +47,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private val pReqCode = 101
 
+    lateinit var mSearchItem: MenuItem
+    lateinit var mToolbar: androidx.appcompat.widget.Toolbar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,9 +56,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ): View? {
 
         binding = FragmentMapBinding.inflate(inflater, container, false)
+
+        mToolbar = binding.root.findViewById(R.id.toolbar2)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mToolbar.inflateMenu(R.menu.material_search_view)
+            var menu: Menu = mToolbar.menu
+        }
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         var mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment?
+
 
         contextMap = this.context!!
 
@@ -67,34 +82,70 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
 
-        binding.svLocation.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                val location: String = binding.svLocation.query.toString()
-                var addressList = mutableListOf<Address>()
-                if (location.isNotEmpty()) {
-                    var geocoder   = Geocoder(contextMap)
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1)
+//        binding.svLocation.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                val location: String = binding.svLocation.query.toString()
+//                var addressList = mutableListOf<Address>()
+//                if (location.isNotEmpty()) {
+//                    var geocoder   = Geocoder(contextMap)
+//                    try {
+//                        addressList = geocoder.getFromLocationName(location, 1)
+//
+//                    } catch (e: IOException) {
+//                    }
+//                    var address: Address = addressList[0]
+//                    val newLocation = LatLng(address.latitude, address.longitude)
+//                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
+//                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
+//                }
+//                return false
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                return false
+//            }
+//
+//        })
+//        binding.svLocation.setonSea
 
-                    } catch (e: IOException) {
-                    }
-                    var address: Address = addressList[0]
-                    val newLocation = LatLng(address.latitude, address.longitude)
-                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
-                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
-                }
-                return false
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
-
-        })
-        
         mapFragment?.getMapAsync(this)
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.material_search_view, menu)
+        mSearchItem = menu.findItem(R.id.m_search)
+        mSearchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                animateSearchToolbar(1, true, true)
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                if (mSearchItem.isActionViewExpanded()) {
+                    animateSearchToolbar(1, false, false)
+                }
+                return true
+            }
+        })
+    }
+
+    private fun animateSearchToolbar(
+        numberOfMenuIcon: Int,
+        containsOverflow: Boolean,
+        show: Boolean
+    ) {
+        mToolbar.setBackgroundColor(ContextCompat.getColor(contextMap, android.R.color.white))
+        if (show) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+
+            }
+        }
+
+
     }
 
     private fun fetchLastLocation() {
