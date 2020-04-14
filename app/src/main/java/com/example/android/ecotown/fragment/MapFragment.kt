@@ -3,9 +3,11 @@ package com.example.android.ecotown.fragment
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.database.MatrixCursor
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.provider.Telephony
 import android.util.Log
@@ -13,9 +15,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Adapter
+import android.widget.CursorAdapter
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.example.android.ecotown.Adapters.SearchAdapter
 
 import com.example.android.ecotown.R
 import com.example.android.ecotown.databinding.FragmentMapBinding
@@ -72,7 +77,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val location: String = binding.svLocation.query.toString()
                 var addressList = mutableListOf<Address>()
                 if (location.isNotEmpty()) {
-                    var geocoder   = Geocoder(contextMap)
+                    var geocoder = Geocoder(contextMap)
                     try {
                         addressList = geocoder.getFromLocationName(location, 1)
 
@@ -92,9 +97,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
 
         })
-        
+
         mapFragment?.getMapAsync(this)
         return binding.root
+    }
+
+    private fun loadHistory(query: String) {
+        var items = mutableListOf<String>()
+        items.add("test 1")
+        items.add("test 2")
+
+        var columns = mutableListOf<String>()
+        columns.add("id")
+        columns.add("text")
+        var temp = mutableListOf<Any>()
+        temp.add(0)
+        temp.add("default")
+
+        var cursor = MatrixCursor(columns.toTypedArray())
+        for(i in items) {
+
+            temp[0] = i
+            temp[1] = i
+
+            cursor.addRow(temp);
+        }
+        binding.svLocation.suggestionsAdapter = SearchAdapter(contextMap, cursor, items)
+
+
     }
 
     private fun fetchLastLocation() {
