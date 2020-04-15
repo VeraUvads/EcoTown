@@ -1,9 +1,12 @@
 package com.example.android.ecotown.fragment
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.ActionBar
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -12,11 +15,13 @@ import android.os.Bundle
 import android.provider.Telephony
 import android.util.Log
 import android.view.*
+import android.view.animation.TranslateAnimation
 import androidx.fragment.app.Fragment
 import android.widget.SearchView
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
 
@@ -31,8 +36,11 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
+import kotlinx.android.synthetic.main.fragment_map.view.*
+import kotlinx.android.synthetic.main.toolbar_search_view.view.*
 import java.io.IOException
 import java.lang.Exception
+import kotlin.time.nanoseconds
 
 
 class MapFragment : Fragment(), OnMapReadyCallback {
@@ -47,8 +55,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private val pReqCode = 101
 
+    lateinit var mToolbar: Toolbar
+
     lateinit var mSearchItem: MenuItem
-    lateinit var mToolbar: androidx.appcompat.widget.Toolbar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,18 +66,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         binding = FragmentMapBinding.inflate(inflater, container, false)
 
+
+        var mapFragment = childFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment?
+
+
         mToolbar = binding.root.findViewById(R.id.toolbar2)
+        (activity as AppCompatActivity).setSupportActionBar(mToolbar)
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mToolbar.inflateMenu(R.menu.material_search_view)
             var menu: Menu = mToolbar.menu
         }
-
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        var mapFragment = childFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment?
-
 
         contextMap = this.context!!
 
@@ -82,50 +92,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
 
-//        binding.svLocation.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                val location: String = binding.svLocation.query.toString()
-//                var addressList = mutableListOf<Address>()
-//                if (location.isNotEmpty()) {
-//                    var geocoder   = Geocoder(contextMap)
-//                    try {
-//                        addressList = geocoder.getFromLocationName(location, 1)
-//
-//                    } catch (e: IOException) {
-//                    }
-//                    var address: Address = addressList[0]
-//                    val newLocation = LatLng(address.latitude, address.longitude)
-//                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
-//                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
-//                }
-//                return false
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                return false
-//            }
-//
-//        })
-//        binding.svLocation.setonSea
-
 
         mapFragment?.getMapAsync(this)
         return binding.root
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.material_search_view, menu)
         mSearchItem = menu.findItem(R.id.m_search)
         mSearchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                animateSearchToolbar(1, true, true)
+                animateSearchToolbar(1, containsOverflow = true, show = true)
                 return true
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                if (mSearchItem.isActionViewExpanded()) {
-                    animateSearchToolbar(1, false, false)
+                if (mSearchItem.isActionViewExpanded) {
+                    animateSearchToolbar(1, containsOverflow = false, show = false)
                 }
                 return true
             }
@@ -137,15 +121,57 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         containsOverflow: Boolean,
         show: Boolean
     ) {
+
         mToolbar.setBackgroundColor(ContextCompat.getColor(contextMap, android.R.color.white))
         if (show) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                var first =
+                    if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) else 0
+                var second =
+                    resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) * numberOfMenuIcon / 2
+                var width: Int = mToolbar.width.minus(first.minus(second))
 
+                var rtl = if (isRtl(resources)) mToolbar.width - width else width
+
+                var createCircularReveal: Animator =
+                    ViewAnimationUtils.createCircularReveal(
+                        mToolbar, rtl, mToolbar.height / 2, 0.0f,
+                        width.toFloat()
+                    )
+                createCircularReveal.duration = 220
+                createCircularReveal.start()
+            } else {
+                var translateAnimation =
+                    TranslateAnimation(0.0f, 0.0f, -mToolbar.height.toFloat(), 0.0f)
+                translateAnimation.duration = 220
+                mToolbar.clearAnimation()
+                mToolbar.startAnimation(translateAnimation)
 
             }
-        }
+        } else {
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                var first =
+                    if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) else 0
+                var second =
+                    resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) * numberOfMenuIcon / 2
+                var width: Int = mToolbar.width.minus(first.minus(second))
+                var rtl = if (isRtl(resources)) mToolbar.width - width else width
 
+                var createCircularReveal: Animator =
+                    ViewAnimationUtils.createCircularReveal(
+                        mToolbar, rtl, mToolbar.height / 2, 0.0f,
+                        width.toFloat()
+                    )
+                createCircularReveal.duration = 220
+             //   createCircularReveal.addListener
+                }
+            }
+
+    }
+
+    private fun isRtl(resources: Resources): Boolean {
+        return resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
     }
 
     private fun fetchLastLocation() {
