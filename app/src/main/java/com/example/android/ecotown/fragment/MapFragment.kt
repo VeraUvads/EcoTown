@@ -2,6 +2,7 @@ package com.example.android.ecotown.fragment
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -67,32 +68,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
 
-        binding.svLocation.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                val location: String = binding.svLocation.query.toString()
-                var addressList = mutableListOf<Address>()
-                if (location.isNotEmpty()) {
-                    var geocoder   = Geocoder(contextMap)
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1)
+       
 
-                    } catch (e: IOException) {
-                    }
-                    var address: Address = addressList[0]
-                    val newLocation = LatLng(address.latitude, address.longitude)
-                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
-                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
-                }
-                return false
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
 
-        })
-        
         mapFragment?.getMapAsync(this)
         return binding.root
     }
