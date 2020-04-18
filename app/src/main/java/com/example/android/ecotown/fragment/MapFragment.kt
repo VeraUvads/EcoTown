@@ -1,22 +1,22 @@
 package com.example.android.ecotown.fragment
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
-import android.provider.Telephony
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.SearchView
+import android.speech.RecognizerIntent
+import android.text.TextUtils
+import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-
+import androidx.fragment.app.Fragment
+import br.com.mauker.materialsearchview.MaterialSearchView
 import com.example.android.ecotown.R
 import com.example.android.ecotown.databinding.FragmentMapBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -28,11 +28,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
-import java.io.IOException
-import java.lang.Exception
 
 
 class MapFragment : Fragment(), OnMapReadyCallback {
+
 
     //    lateinit var adressList: MutableList<Address>
     lateinit var binding: FragmentMapBinding
@@ -43,6 +42,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var currentLocation: Location
     lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private val pReqCode = 101
+
+    lateinit var searchView: MaterialSearchView
+
+    private lateinit var mToolbar: Toolbar
 
 
     override fun onCreateView(
@@ -67,32 +70,47 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
 
-        binding.svLocation.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                val location: String = binding.svLocation.query.toString()
-                var addressList = mutableListOf<Address>()
-                if (location.isNotEmpty()) {
-                    var geocoder   = Geocoder(contextMap)
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1)
+        searchView = binding.searchView
 
-                    } catch (e: IOException) {
-                    }
-                    var address: Address = addressList[0]
-                    val newLocation = LatLng(address.latitude, address.longitude)
-                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
-                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
-                }
+    //  mToolbar = (activity as AppCompatActivity).findViewById(R.id.toolbar)
+            mToolbar = binding.toolbar2
+            (activity as AppCompatActivity).setSupportActionBar(mToolbar)
+
+
+
+
+        searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
-
         })
-        
+
+        searchView.setSearchViewListener(object : MaterialSearchView.SearchViewListener {
+            override fun onSearchViewOpened() {
+            }
+
+            override fun onSearchViewClosed() {
+            }
+        })
+
+        searchView.setOnItemClickListener { parent, view, position, id ->
+            val suggestion: String = searchView.getSuggestionAtPosition(position)
+            searchView.setQuery(suggestion, false)
+        }
+
+        searchView.adjustTintAlpha(0.8f)
+
+   //     searchView.openSearch()
+
+//
+//        searchView.post {
+//            searchView.openSearch()
+//        }
+
         mapFragment?.getMapAsync(this)
         return binding.root
     }
@@ -129,6 +147,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+
     override fun onMapReady(p0: GoogleMap) {
 
         mMap = p0
@@ -147,5 +166,46 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 fetchLastLocation()
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.search_menu, menu)
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val id = item.itemId
+        if (id == R.id.action_search) {
+            searchView.openSearch()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == Activity.RESULT_OK) {
+            val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (matches != null && matches.size > 0) {
+                val searchWrd = matches[0]
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    searchView.setQuery(searchWrd, false)
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        searchView.clearSuggestions()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        searchView.activityResumed()
+        val arr = resources.getStringArray(R.array.suggestions)
+        searchView.addSuggestions(arr)
     }
 }

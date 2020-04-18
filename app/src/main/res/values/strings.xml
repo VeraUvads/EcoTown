@@ -4,4 +4,21 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
+
+    <string-array name="suggestions">
+        <item>Apple</item>
+        <item>Apricot</item>
+        <item>Avocado</item>
+        <item>Banana</item>
+        <item>Blueberry</item>
+        <item>Blackberry</item>
+        <item>Carrot</item>
+        <item>Cherry</item>
+        <item>Orange</item>
+        <item>Potato</item>
+        <item>Peach</item>
+        <item>Passion fruit</item>
+        <item>Pear</item>
+        <item>Strawberry</item>
+    </string-array>
 </resources>
