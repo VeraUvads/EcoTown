@@ -9,12 +9,12 @@ import android.location.Location
 import android.os.Bundle
 import android.provider.Telephony
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 
 import com.example.android.ecotown.R
@@ -28,6 +28,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
+import com.miguelcatalan.materialsearchview.MaterialSearchView
+import kotlinx.android.synthetic.main.fragment_map.*
 import java.io.IOException
 import java.lang.Exception
 
@@ -43,7 +45,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var currentLocation: Location
     lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private val pReqCode = 101
-
+    private lateinit var toolbar: Toolbar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,6 +56,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         var mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment?
 
+        toolbar = binding.toolbar
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+        setHasOptionsMenu(true)
+
         contextMap = this.context!!
 
         if (mapFragment == null) {
@@ -63,11 +70,64 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             ft?.replace(R.id.map, mapFragment)?.commit()
         }
 
+        searchView()
+
+
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
-        
+
         mapFragment?.getMapAsync(this)
         return binding.root
+    }
+
+    private fun searchView() {
+        binding.searchView.setCursorDrawable(R.drawable.custom_cursor)
+
+        binding.searchView.setVoiceSearch(false);
+        binding.searchView.setCursorDrawable(R.drawable.custom_cursor);
+        binding.searchView.setEllipsize(true);
+     //   binding.searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
+        binding.searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                val location: String = binding.searchView.toString()
+                var addressList = mutableListOf<Address>()
+                if (location.isNotEmpty()) {
+                    var geocoder   = Geocoder(contextMap)
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1)
+
+                    } catch (e: IOException) {
+                    }
+                    var address: Address = addressList[0]
+                    val newLocation = LatLng(address.latitude, address.longitude)
+                    mMap.addMarker(MarkerOptions().position(newLocation).title("New Location"))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 10f))
+                    Log.i("Vera", "${newLocation.latitude} ${newLocation.longitude}")
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+
+
+
+        binding.searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
+            override fun onSearchViewClosed() {
+            }
+
+            override fun onSearchViewShown() {
+            }
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu, menu)
+        val item = menu.findItem(R.id.action_search);
+        binding.searchView.setMenuItem(item);
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun fetchLastLocation() {
