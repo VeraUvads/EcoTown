@@ -15,6 +15,9 @@
     <color name="gradient_end_color">#18a3fe</color>
 
 
+    <color name="bg_searchView">#744B4B50</color>
+
+
     <!-- colors for tab and screent text -->
 
     <color name="tab_indicator_gray">#c0c0c0</color>

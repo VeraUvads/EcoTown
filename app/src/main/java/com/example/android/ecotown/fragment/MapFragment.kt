@@ -1,13 +1,18 @@
 package com.example.android.ecotown.fragment
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.provider.Telephony
+import android.speech.RecognizerIntent
+import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -16,6 +21,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import br.com.mauker.materialsearchview.MaterialSearchView
 
 import com.example.android.ecotown.R
 import com.example.android.ecotown.databinding.FragmentMapBinding
@@ -28,7 +34,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
-import com.miguelcatalan.materialsearchview.MaterialSearchView
 import kotlinx.android.synthetic.main.fragment_map.*
 import java.io.IOException
 import java.lang.Exception
@@ -72,7 +77,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         searchView()
 
-
         mFusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this.activity!!)
 
@@ -81,12 +85,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun searchView() {
-        binding.searchView.setCursorDrawable(R.drawable.custom_cursor)
 
-        binding.searchView.setVoiceSearch(false);
-        binding.searchView.setCursorDrawable(R.drawable.custom_cursor);
-        binding.searchView.setEllipsize(true);
-     //   binding.searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
+        binding.searchView.setBackgroundColor(resources.getColor(R.color.bg_searchView))
+
         binding.searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 val location: String = binding.searchView.toString()
@@ -111,24 +112,35 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 return false
             }
         })
-
-
-
-        binding.searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
-            override fun onSearchViewClosed() {
-            }
-
-            override fun onSearchViewShown() {
-            }
-        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_menu, menu)
-        val item = menu.findItem(R.id.action_search);
-        binding.searchView.setMenuItem(item);
         super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.search_menu, menu)
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.action_search) {
+            binding.searchView.openSearch()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == Activity.RESULT_OK) {
+            val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (matches != null && matches.size > 0) {
+                val searchWrd = matches[0]
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    binding.searchView.setQuery(searchWrd, false)
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
 
     private fun fetchLastLocation() {
         if (ContextCompat.checkSelfPermission(
