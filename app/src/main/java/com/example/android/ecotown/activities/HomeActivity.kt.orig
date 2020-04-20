@@ -74,6 +74,10 @@ class HomeActivity : AppCompatActivity() {
 
         supportFragmentManager.beginTransaction().replace(R.id.container, HomeFragment()).commit()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4e71b54b197f027e9ce75a1103d59b4fd10f3f72
         bindingHome.bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> {
