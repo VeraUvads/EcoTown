@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.nav_header.view.*
 import kotlinx.android.synthetic.main.popup.view.*
 
 
-class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class HomeActivity : AppCompatActivity() {
     private lateinit var bindingHome: ActivityHomeBinding
     private lateinit var bindingContent: ContentMainBinding
     private lateinit var bindingPopUp: PopupBinding
@@ -69,63 +69,30 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth.currentUser!!
-        navHeader(currentUser)
-
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container, HomeFragment()).commit()
-
-        drawerLayout = bindingHome.drawerLayout
-        navView = bindingHome.navView
-        val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, 0, 0
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        navView.setNavigationItemSelectedListener(this)
 
 
-    }
+        supportFragmentManager.beginTransaction().replace(R.id.container, HomeFragment()).commit()
 
-    private fun navHeader(currentUser: FirebaseUser?) {
-        val navView: NavigationView = bindingHome.navView
-        val headerView = navView.getHeaderView(0)
-        val navName = headerView.nav_user_name
-        val navMail = headerView.nav_user_mail
-
-        navMail.text = currentUser?.email
-        navName.text = currentUser?.displayName
-
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-
-        supportActionBar?.title = item.title
-
-        when (item.itemId) {
-            R.id.nav_home -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, HomeFragment()).commit()
-
+        bindingHome.bottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_home -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, HomeFragment()).commit()
+                }
+                R.id.nav_track -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, TrackFragment()).commit()
+                }
+                R.id.nav_map -> {
+                }
+                R.id.nav_logout -> {
+                    FirebaseAuth.getInstance().signOut()
+                    startActivity(Intent(this, LoginActivity::class.java))
+                }
             }
-            R.id.nav_track -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, TrackFragment()).commit()
-            }
-            R.id.nav_map -> {
-            }
-            R.id.nav_settings -> {
-            }
-            R.id.nav_logout -> {
-                FirebaseAuth.getInstance().signOut()
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
+
+            return@setOnNavigationItemSelectedListener true
         }
-        drawerLayout.closeDrawer(GravityCompat.START)
-        return true
     }
 
     fun iniPop(view: View) {
@@ -145,8 +112,6 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         bindingPopUp.popupAddButton.setOnClickListener {
             addingButton(it)
         }
-
-
     }
 
     private fun checkAndRequestForPermission(view: View) {
@@ -158,10 +123,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 )
             ) {
-
                 Toast.makeText(this, "Пожалуйста настройте доступ к медиа", Toast.LENGTH_SHORT)
                     .show();
-
             } else {
                 ActivityCompat.requestPermissions(
                     this,
@@ -169,7 +132,6 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     pReqCode
                 )
             }
-
         } else
             openGallery()
     }
@@ -184,11 +146,8 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == this.requestCode && data != null) {
-
             pickedImgUri = data.data!!
             bindingPopUp.addPicture.setImageURI(pickedImgUri)
-
-
         }
     }
 
@@ -228,11 +187,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 view.visibility = View.VISIBLE
                 bar.visibility = View.INVISIBLE
             }
-
-
         }
-
-
     }
 
     private fun addPost(post: Post) {
